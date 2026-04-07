@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Nabung</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -9,53 +10,49 @@
 
 <h1>💰 Aplikasi Nabung</h1>
 
-<form action="/tambah" method="POST">
+<!-- FORM -->
+<form action="/tambah" method="POST" class="form-box">
     <input type="text" name="nama" placeholder="Nama Target" required>
     <input type="number" name="target" placeholder="Target (Rp)" required>
     <button type="submit">Tambah</button>
 </form>
 
-<hr>
-
-<h2>Target Tabungan</h2>
-
+<!-- LIST -->
 <div class="container">
     {% for item in tabungan %}
     <div class="card">
+
         <h3>{{ item[1] }}</h3>
 
         <p>Target: Rp {{ item[2] }}</p>
         <p>Terkumpul: Rp {{ item[3] }}</p>
 
+        {% set persen = (item[3] / item[2] * 100) if item[2] else 0 %}
+        <p>Progress: {{ "%.1f"|format(persen) }}%</p>
+
         <div class="progress">
-            <div class="bar" style="width: {{ (item[3] / item[2] * 100) if item[2] else 0 }}%"></div>
+            <div class="bar" style="width: {{ persen }}%"></div>
         </div>
 
         <p>Sisa: Rp {{ item[2] - item[3] }}</p>
 
+        {% if item[3] >= item[2] %}
+            <p class="done">✅ Tercapai</p>
+        {% else %}
+            <p class="process">⏳ Proses</p>
+        {% endif %}
+
+        <!-- NABUNG -->
         <form action="/nabung/{{ item[0] }}" method="POST">
             <input type="number" name="jumlah" placeholder="Jumlah nabung" required>
             <button type="submit">Nabung</button>
         </form>
 
         <a href="/hapus/{{ item[0] }}" class="hapus">Hapus</a>
+
     </div>
     {% endfor %}
 </div>
-
-<hr>
-
-<h2>📜 Riwayat Nabung</h2>
-
-<ul>
-    {% for r in riwayat %}
-    <li>
-        ID Tabungan {{ r[1] }} - Rp {{ r[2] }} ({{ r[3] }})
-    </li>
-    {% endfor %}
-</ul>
-
-<script src="/static/script.js"></script>
 
 </body>
 </html>
