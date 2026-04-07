@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Aplikasi Nabung</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h1>💰 Aplikasi Nabung</h1>
+
+<form action="/tambah" method="POST">
+    <input type="text" name="nama" placeholder="Nama Target" required>
+    <input type="number" name="target" placeholder="Target (Rp)" required>
+    <button type="submit">Tambah</button>
+</form>
+
+<hr>
+
+<h2>Target Tabungan</h2>
+
+<div class="container">
+    {% for item in tabungan %}
+    <div class="card">
+        <h3>{{ item[1] }}</h3>
+
+        <p>Target: Rp {{ item[2] }}</p>
+        <p>Terkumpul: Rp {{ item[3] }}</p>
+
+        <div class="progress">
+            <div class="bar" style="width: {{ (item[3] / item[2] * 100) if item[2] else 0 }}%"></div>
+        </div>
+
+        <p>Sisa: Rp {{ item[2] - item[3] }}</p>
+
+        <form action="/nabung/{{ item[0] }}" method="POST">
+            <input type="number" name="jumlah" placeholder="Jumlah nabung" required>
+            <button type="submit">Nabung</button>
+        </form>
+
+        <a href="/hapus/{{ item[0] }}" class="hapus">Hapus</a>
+    </div>
+    {% endfor %}
+</div>
+
+<hr>
+
+<h2>📜 Riwayat Nabung</h2>
+
+<ul>
+    {% for r in riwayat %}
+    <li>
+        ID Tabungan {{ r[1] }} - Rp {{ r[2] }} ({{ r[3] }})
+    </li>
+    {% endfor %}
+</ul>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>
