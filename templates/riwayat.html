@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h1>📜 Riwayat Nabung</h1>
+
+<h2>{{ tabungan[1] }}</h2>
+
+<a href="/" class="back">⬅ Kembali</a>
+
+<div class="container">
+{% for r in riwayat %}
+    <div class="card">
+        <p>💰 Rp {{ r[2] }}</p>
+        <p>🕒 {{ r[3] }}</p>
+    </div>
+{% endfor %}
+</div>
+
+{% if not riwayat %}
+<p style="text-align:center;">Belum ada riwayat</p>
+{% endif %}
+
+</body>
+</html>

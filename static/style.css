@@ -1,17 +1,14 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     margin: 0;
     padding: 10px;
     background: #f0f2f5;
 }
 
-/* JUDUL */
-h1 {
+h1, h2 {
     text-align: center;
-    margin-bottom: 20px;
 }
 
-/* FORM */
 .form-box {
     display: flex;
     flex-direction: column;
@@ -20,88 +17,76 @@ h1 {
 }
 
 input, button {
-    padding: 12px;
-    font-size: 16px;
+    padding: 10px;
     border-radius: 8px;
-    border: 1px solid #ccc;
 }
 
 button {
     background: green;
     color: white;
     border: none;
-    cursor: pointer;
 }
 
-button:hover {
-    background: darkgreen;
-}
-
-/* CONTAINER */
 .container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 15px;
 }
 
-/* CARD */
 .card {
     background: white;
     padding: 15px;
     border-radius: 12px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-    transition: 0.3s;
 }
 
-.card:hover {
-    transform: scale(1.02);
-}
-
-/* PROGRESS */
 .progress {
     background: #ddd;
     height: 10px;
     border-radius: 5px;
-    margin: 10px 0;
 }
 
 .bar {
-    background: linear-gradient(to right, green, lime);
+    background: green;
     height: 10px;
     border-radius: 5px;
 }
 
-/* STATUS */
-.done {
-    color: green;
-    font-weight: bold;
-}
-
-.process {
-    color: orange;
-    font-weight: bold;
-}
-
-/* HAPUS */
 .hapus {
-    display: inline-block;
-    margin-top: 10px;
     color: red;
+    display: block;
+    margin-top: 10px;
+}
+
+.btn-riwayat {
+    display: block;
+    margin-top: 10px;
+    padding: 8px;
+    background: blue;
+    color: white;
+    text-align: center;
+    border-radius: 8px;
     text-decoration: none;
 }
 
-/* 📱 RESPONSIVE HP */
-@media (max-width: 600px) {
-    h1 {
-        font-size: 20px;
-    }
+.riwayat-list {
+    list-style: none;
+    padding: 0;
+}
 
-    input, button {
-        font-size: 14px;
-        padding: 10px;
-    }
+.riwayat-list li {
+    background: white;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+}
 
-    .card {
-        padding: 12px;
-    }
+.logout {
+    display: block;
+    text-align: right;
+    margin-bottom: 10px;
+}
+
+.back {
+    display: block;
+    margin-bottom: 15px;
 }
