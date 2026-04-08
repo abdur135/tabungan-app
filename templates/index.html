@@ -34,15 +34,15 @@
         <div class="bar" style="width: {{ persen }}%"></div>
     </div>
 
-    <p>{{ "%.1f"|format(persen) }}%</p>
+    <p>Progres : {{ "%.1f"|format(persen) }}%</p>
 
     <form action="/nabung/{{ t[0] }}" method="POST">
         <input type="number" name="jumlah" class="rupiah" placeholder="Jumlah nabung" required>
         <button>Nabung</button>
     </form>
     <form action="/kurang/{{ t[0] }}" method="POST">
-    <input type="text" name="jumlah" class="rupiah" placeholder="Kurangi" required>
-    <button style="background:red;">Kurangi</button>
+        <input type="number" name="jumlah" class="rupiah" placeholder="Kurangi" required>
+        <button style="background:red;">Kurangi</button>
     </form>
 
     <a href="/riwayat/{{ t[0] }}" class="btn-riwayat">📜 Riwayat</a>
