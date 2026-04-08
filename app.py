@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-import psycopg2
-import os
+import sqlite3
 from datetime import datetime
 
 app = Flask(__name__)
@@ -8,51 +7,15 @@ app.secret_key = "secret123"
 
 # ================= DB =================
 def get_db():
-    url = os.environ.get("DATABASE_URL")
+    return sqlite3.connect("database.db")
 
-    if not url:
-        raise Exception("❌ DATABASE_URL tidak ditemukan!")
 
-    return psycopg2.connect(url)
-
-def init_db():
-    conn = get_db()
-    cur = conn.cursor()
-
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        username TEXT UNIQUE,
-        password TEXT
-    )
-    """)
-
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS tabungan (
-        id SERIAL PRIMARY KEY,
-        nama TEXT,
-        target INTEGER,
-        terkumpul INTEGER,
-        user_id INTEGER
-    )
-    """)
-
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS riwayat (
-        id SERIAL PRIMARY KEY,
-        tabungan_id INTEGER,
-        jumlah INTEGER,
-        tanggal TEXT
-    )
-    """)
-
-    conn.commit()
-    cur.close()
-    conn.close()
+# ================= HELPER =================
+def bersihin_angka(angka):
+    return int(angka.replace(".", ""))
 
 
 # ================= AUTH =================
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -63,12 +26,11 @@ def login():
         cur = conn.cursor()
 
         cur.execute(
-            "SELECT * FROM users WHERE username=%s AND password=%s",
+            "SELECT * FROM users WHERE username=? AND password=?",
             (username, password)
         )
         user = cur.fetchone()
 
-        cur.close()
         conn.close()
 
         if user:
@@ -91,16 +53,14 @@ def register():
 
         try:
             cur.execute(
-                "INSERT INTO users (username, password) VALUES (%s, %s)",
+                "INSERT INTO users (username, password) VALUES (?, ?)",
                 (username, password)
             )
             conn.commit()
         except:
             return "Username sudah ada!"
 
-        cur.close()
         conn.close()
-
         return redirect("/login")
 
     return render_template("register.html")
@@ -113,7 +73,6 @@ def logout():
 
 
 # ================= MAIN =================
-
 @app.route("/")
 def index():
     if "user_id" not in session:
@@ -123,20 +82,16 @@ def index():
     cur = conn.cursor()
 
     cur.execute(
-        "SELECT * FROM tabungan WHERE user_id=%s",
+        "SELECT * FROM tabungan WHERE user_id=?",
         (session["user_id"],)
     )
-    tabungan = cur.fetchall()
+    data = cur.fetchall()
 
-    cur.close()
     conn.close()
+    return render_template("index.html", tabungan=data)
 
-    return render_template("index.html", tabungan=tabungan)
 
-def bersihin_angka(angka):
-    return int(angka.replace(".", ""))
-
-# tambah tabungan
+# ================= TAMBAH =================
 @app.route("/tambah", methods=["POST"])
 def tambah():
     if "user_id" not in session:
@@ -149,50 +104,17 @@ def tambah():
     cur = conn.cursor()
 
     cur.execute(
-        "INSERT INTO tabungan (nama, target, terkumpul, user_id) VALUES (%s, %s, 0, %s)",
-        (nama, int(target), session["user_id"])
+        "INSERT INTO tabungan (nama, target, terkumpul, user_id) VALUES (?, ?, 0, ?)",
+        (nama, target, session["user_id"])
     )
 
     conn.commit()
-    cur.close()
-    conn.close()
-
-    return redirect("/")
-
-@app.route("/kurang/<int:id>", methods=["POST"])
-def kurang(id):
-    jumlah = bersihin_angka(request.form["jumlah"])
-
-    conn = get_db()
-    cur = conn.cursor()
-
-    # ambil saldo sekarang
-    cur.execute("SELECT terkumpul FROM tabungan WHERE id=%s", (id,))
-    sekarang = cur.fetchone()[0]
-
-    # biar gak minus
-    if sekarang - jumlah < 0:
-        jumlah = sekarang
-
-    cur.execute(
-        "UPDATE tabungan SET terkumpul = terkumpul - %s WHERE id=%s",
-        (jumlah, id)
-    )
-
-    # simpan riwayat minus
-    cur.execute(
-        "INSERT INTO riwayat (tabungan_id, jumlah, tanggal) VALUES (%s, %s, %s)",
-        (id, -jumlah, datetime.now().strftime("%Y-%m-%d %H:%M"))
-    )
-
-    conn.commit()
-    cur.close()
     conn.close()
 
     return redirect("/")
 
 
-# nabung + riwayat
+# ================= NABUNG =================
 @app.route("/nabung/<int:id>", methods=["POST"])
 def nabung(id):
     jumlah = bersihin_angka(request.form["jumlah"])
@@ -201,60 +123,86 @@ def nabung(id):
     cur = conn.cursor()
 
     cur.execute(
-        "UPDATE tabungan SET terkumpul = terkumpul + %s WHERE id=%s",
-        (int(jumlah), id)
+        "UPDATE tabungan SET terkumpul = terkumpul + ? WHERE id=?",
+        (jumlah, id)
     )
 
     cur.execute(
-        "INSERT INTO riwayat (tabungan_id, jumlah, tanggal) VALUES (%s, %s, %s)",
-        (id, int(jumlah), datetime.now().strftime("%Y-%m-%d %H:%M"))
+        "INSERT INTO riwayat (tabungan_id, jumlah, tanggal) VALUES (?, ?, ?)",
+        (id, jumlah, datetime.now().strftime("%Y-%m-%d %H:%M"))
     )
 
     conn.commit()
-    cur.close()
     conn.close()
 
     return redirect("/")
 
 
-# hapus
+# ================= KURANG =================
+@app.route("/kurang/<int:id>", methods=["POST"])
+def kurang(id):
+    jumlah = bersihin_angka(request.form["jumlah"])
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("SELECT terkumpul FROM tabungan WHERE id=?", (id,))
+    sekarang = cur.fetchone()[0]
+
+    if sekarang - jumlah < 0:
+        jumlah = sekarang
+
+    cur.execute(
+        "UPDATE tabungan SET terkumpul = terkumpul - ? WHERE id=?",
+        (jumlah, id)
+    )
+
+    cur.execute(
+        "INSERT INTO riwayat (tabungan_id, jumlah, tanggal) VALUES (?, ?, ?)",
+        (id, -jumlah, datetime.now().strftime("%Y-%m-%d %H:%M"))
+    )
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/")
+
+
+# ================= HAPUS =================
 @app.route("/hapus/<int:id>")
 def hapus(id):
     conn = get_db()
     cur = conn.cursor()
 
-    cur.execute("DELETE FROM tabungan WHERE id=%s", (id,))
-    cur.execute("DELETE FROM riwayat WHERE tabungan_id=%s", (id,))
+    cur.execute("DELETE FROM tabungan WHERE id=?", (id,))
+    cur.execute("DELETE FROM riwayat WHERE tabungan_id=?", (id,))
 
     conn.commit()
-    cur.close()
     conn.close()
 
     return redirect("/")
 
 
-# riwayat
+# ================= RIWAYAT =================
 @app.route("/riwayat/<int:id>")
 def riwayat(id):
     conn = get_db()
     cur = conn.cursor()
 
-    cur.execute("SELECT * FROM tabungan WHERE id=%s", (id,))
+    cur.execute("SELECT * FROM tabungan WHERE id=?", (id,))
     tabungan = cur.fetchone()
 
     cur.execute(
-        "SELECT * FROM riwayat WHERE tabungan_id=%s ORDER BY tanggal DESC",
+        "SELECT * FROM riwayat WHERE tabungan_id=? ORDER BY tanggal DESC",
         (id,)
     )
-    riwayat = cur.fetchall()
+    data = cur.fetchall()
 
-    cur.close()
     conn.close()
 
-    return render_template("riwayat.html", tabungan=tabungan, riwayat=riwayat)
+    return render_template("riwayat.html", tabungan=tabungan, riwayat=data)
+
 
 # ================= RUN =================
-
 if __name__ == "__main__":
-    init_db()
     app.run(debug=True)
