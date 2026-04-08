@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Nabung</title>
     <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/script.js"></script>
 </head>
 <body>
 
@@ -14,7 +15,7 @@
 
 <form action="/tambah" method="POST" class="form-box">
     <input type="text" name="nama" placeholder="Nama Tabungan" required>
-    <input type="number" name="target" placeholder="Target (Rp)" required>
+    <input type="number" name="target" class="rupiah" placeholder="Target (Rp)" required>
     <button>Tambah</button>
 </form>
 
@@ -24,8 +25,8 @@
 
     <h3>{{ t[1] }}</h3>
 
-    <p>Target: Rp {{ t[2] }}</p>
-    <p>Terkumpul: Rp {{ t[3] }}</p>
+    <p>Target: Rp {{ "{:,}".format(t[2]).replace(",", ".") }}</p>
+    <p>Terkumpul: Rp {{ "{:,}".format(t[3]).replace(",", ".") }}</p>
 
     {% set persen = (t[3] / t[2] * 100) if t[2] else 0 %}
 
@@ -36,8 +37,12 @@
     <p>{{ "%.1f"|format(persen) }}%</p>
 
     <form action="/nabung/{{ t[0] }}" method="POST">
-        <input type="number" name="jumlah" placeholder="Jumlah nabung" required>
+        <input type="number" name="jumlah" class="rupiah" placeholder="Jumlah nabung" required>
         <button>Nabung</button>
+    </form>
+    <form action="/kurang/{{ t[0] }}" method="POST">
+    <input type="text" name="jumlah" class="rupiah" placeholder="Kurangi" required>
+    <button style="background:red;">Kurangi</button>
     </form>
 
     <a href="/riwayat/{{ t[0] }}" class="btn-riwayat">📜 Riwayat</a>

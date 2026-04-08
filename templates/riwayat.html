@@ -17,7 +17,7 @@
 <div class="container">
 {% for r in riwayat %}
     <div class="card">
-        <p>💰 Rp {{ r[2] }}</p>
+        <p>💰 Rp {{ "{:,}".format(r[2]).replace(",", ".") }}</p>
         <p>🕒 {{ r[3] }}</p>
     </div>
 {% endfor %}
