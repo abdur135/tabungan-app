@@ -8,7 +8,12 @@ app.secret_key = "secret123"
 
 # ================= DB =================
 def get_db():
-    return psycopg2.connect(os.environ.get("DATABASE_URL"))
+    url = os.environ.get("DATABASE_URL")
+
+    if not url:
+        raise Exception("❌ DATABASE_URL tidak ditemukan!")
+
+    return psycopg2.connect(url)
 
 def init_db():
     conn = get_db()
@@ -45,7 +50,6 @@ def init_db():
     cur.close()
     conn.close()
 
-init_db()
 
 # ================= AUTH =================
 
@@ -252,4 +256,5 @@ def riwayat(id):
 # ================= RUN =================
 
 if __name__ == "__main__":
+    init_db()
     app.run(debug=True)
