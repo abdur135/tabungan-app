@@ -69,7 +69,6 @@ def nabung(id):
 
     return redirect("/")
 
-
 @app.route("/hapus/<int:id>")
 def hapus(id):
     conn = get_db()
@@ -78,6 +77,7 @@ def hapus(id):
     conn.commit()
     conn.close()
     return redirect("/")
+
 
 
 if __name__ == "__main__":

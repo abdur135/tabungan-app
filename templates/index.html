@@ -50,6 +50,17 @@
 
         <a href="/hapus/{{ item[0] }}" class="hapus">Hapus</a>
 
+        <hr>
+        <h2>📜 Riwayat Nabung</h2>
+
+        <ul>
+        {% for r in riwayat %}
+            <li>
+            ID {{ r[1] }} - Rp {{ r[2] }} ({{ r[3] }})
+            </li>
+        {% endfor %}
+        </ul>
+
     </div>
     {% endfor %}
 </div>
