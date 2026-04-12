@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, session
+from flask import Blueprint, render_template, request, redirect, session, flash
 from models import get_db
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -28,12 +28,20 @@ def login():
     return render_template("login.html")
 
 
-# REGISTER
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        username = request.form["username"]
-        password = generate_password_hash(request.form["password"])
+        username = request.form.get("username", "").strip()
+        password_input = request.form.get("password", "")
+
+        # VALIDASI
+        if not username:
+            return "Username tidak boleh kosong!"
+
+        if len(password_input) < 6:
+            return "Password minimal 6 karakter!"
+
+        password = generate_password_hash(password_input)
 
         conn = get_db()
         cur = conn.cursor()
@@ -44,8 +52,8 @@ def register():
                 (username, password)
             )
             conn.commit()
-        except:
-            return "Username sudah ada!"
+        except Exception as e:
+            return "Username sudah digunakan!"
 
         conn.close()
         return redirect("/login")
