@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profil</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="profile-header">
+    <h2>Profil</h2>
+
+    <div class="menu-container">
+        <button class="menu-btn">⋮</button>
+
+        <div class="dropdown">
+            <a href="/edit_profil">Edit Profil</a>
+            <a href="/ganti_password">Ganti Password</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+</div>
+
+<p>Username: {{ user[1] }}</p>
+
+<h3>Ubah Username</h3>
+<form method="POST" action="/ubah_username">
+    <input type="text" name="username" required>
+    <button type="submit">Ubah</button>
+</form>
+
+<h3>Ubah Password</h3>
+<form method="POST" action="/ubah_password">
+    <input type="password" name="password" required>
+    <button type="submit">Ubah</button>
+</form>
+
+<!-- WAJIB -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>

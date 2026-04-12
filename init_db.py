@@ -8,11 +8,12 @@ conn = sqlite3.connect(DB_PATH)
 
 # tabel tabungan
 conn.execute("""
-CREATE TABLE IF NOT EXISTS tabungan (
+CREATE TABLE tabungan (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nama TEXT,
     target INTEGER,
-    terkumpul INTEGER
+    terkumpul INTEGER,
+    user_id INTEGER
 )
 """)
 
@@ -23,6 +24,15 @@ CREATE TABLE IF NOT EXISTS riwayat (
     tabungan_id INTEGER,
     jumlah INTEGER,
     tanggal TEXT
+)
+""")
+
+# tabel user
+conn.execute("""
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE,
+    password TEXT
 )
 """)
 

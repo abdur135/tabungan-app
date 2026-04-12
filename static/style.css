@@ -9,6 +9,11 @@ h1, h2 {
     text-align: center;
 }
 
+.profile-header h2 {
+    text-align: left;
+    margin: 0;
+}
+
 .form-box {
     display: flex;
     flex-direction: column;
@@ -89,4 +94,46 @@ button {
 .back {
     display: block;
     margin-bottom: 15px;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu-container {
+    position: relative;
+}
+
+.menu-btn {
+    display: block;
+    font-size: 24px;
+    color: black;
+    background: red; /* sementara buat debug */
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background: white;
+    min-width: 150px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.dropdown a {
+    display: block;
+    padding: 10px;
+    color: black;
+    text-decoration: none;
+}
+
+.dropdown a:hover {
+    background: #f0f0f0;
 }
